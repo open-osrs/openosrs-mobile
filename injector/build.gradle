@@ -1,0 +1,93 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    gradleApi()
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+
+    implementation 'org.ow2.asm:asm:8.0.1'
+    implementation 'org.ow2.asm:asm-util:8.0.1'
+    implementation 'org.jetbrains:annotations:19.0.0'
+    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'javax.inject:javax.inject:1'
+    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.7.0'
+
+    implementation project(":deobfuscator")
+    implementation project(":runelite-mixins")
+}
+
+task decodeVanillaDex(type: JavaExec) {
+    classpath = files('./lib/apktool_2.4.1.jar')
+    main = 'brut.apktool.Main'
+    args 'd','-f','-s', './lib/osrs.apk'
+}
+
+task vanillaDexToJar(type: JavaExec) {
+    classpath = fileTree(dir: './lib/dex-tools/lib/', include: '*.jar')
+    main = 'com.googlecode.dex2jar.tools.Dex2jarCmd'
+    args './osrs/classes.dex','-f', '-o', './tmp/vanilla.jar'
+}
+
+task injectVanilla(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("../deobfuscator/lib/android.jar"))
+    main = 'com.openosrs.injector.Injector'
+    args new File("./tmp/vanilla.jar"), '194'
+}
+
+task extractVanillaJar(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("../deobfuscator/lib/android.jar"))
+    main = 'com.openosrs.injector.ExtractVanillaJar'
+}
+
+task extractInjectedJar(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("../deobfuscator/lib/android.jar"))
+    main = 'com.openosrs.injector.ExtractInjectedJar'
+}
+
+task patchResources(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath)
+    main = 'com.openosrs.injector.PatchDependencies'
+}
+
+task packPatchedJar(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("../deobfuscator/lib/android.jar"))
+    main = 'com.openosrs.injector.PackPatchedJar'
+}
+
+task patchedJarToDex(type: JavaExec) {
+    classpath = fileTree(dir: './lib/dex-tools/lib/', include: '*.jar')
+    main = 'com.googlecode.dex2jar.tools.Jar2Dex'
+    args './tmp/injected-patched.jar','-f', '-o', './osrs/classes.dex'
+}
+
+task assembleInjected(type: JavaExec) {
+    classpath = files('./lib/apktool_2.4.1.jar')
+    main = 'brut.apktool.Main'
+    args 'b','-f','./osrs/'
+}
+
+task inject(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("../deobfuscator/lib/android.jar"))
+    main = 'com.openosrs.injector.MoveInjectedAPK'
+}
+
+tasks {
+    vanillaDexToJar.dependsOn decodeVanillaDex
+    injectVanilla.dependsOn vanillaDexToJar
+    extractVanillaJar.dependsOn injectVanilla
+    extractInjectedJar.dependsOn extractVanillaJar
+    patchResources.dependsOn extractInjectedJar
+    packPatchedJar.dependsOn patchResources
+    patchedJarToDex.dependsOn packPatchedJar
+    assembleInjected.dependsOn patchedJarToDex
+    inject.dependsOn assembleInjected
+}

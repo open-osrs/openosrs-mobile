@@ -1,0 +1,8 @@
+include ':runelite-mixins'
+include ':runescape-api'
+include ':injection-annotations'
+include ':runelite-api'
+include ':deobfuscator'
+include ':injector'
+include ':client'
+rootProject.name='OSiris'

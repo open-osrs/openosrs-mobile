@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+}

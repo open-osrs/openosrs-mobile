@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    compileOnly 'org.slf4j:slf4j-api:1.7.30'
+    compileOnly 'org.slf4j:slf4j-simple:1.7.30'
+    implementation project(":runelite-api")
+    implementation project(":runescape-api")
+    implementation project(":injection-annotations")
+}

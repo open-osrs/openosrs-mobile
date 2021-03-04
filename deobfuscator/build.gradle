@@ -1,0 +1,40 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+task deobfuscate(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("./lib/android.jar"))
+    main = 'net.runelite.deob.Deob'
+    args new File("./lib/mobile-194-vanilla.jar"), "./lib/mobile-194-deob.jar"
+}
+
+task updateMappings(type: JavaExec) {
+    classpath = files(sourceSets.main.runtimeClasspath, new File("./lib/android.jar"))
+    main = 'net.runelite.deob.updater.UpdateMappings'
+    args "./lib/mobile-194-mapped.jar", "./lib/mobile-194-deob.jar", "./lib/mobile-194-mapped-new.jar"
+}
+
+dependencies {
+    gradleApi()
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+
+    implementation 'org.ow2.asm:asm:8.0.1'
+    implementation 'org.ow2.asm:asm-util:8.0.1'
+    implementation 'org.jetbrains:annotations:20.1.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+
+    implementation 'com.android.support:support-annotations:+'
+
+    implementation project(":runelite-api")
+    implementation project(":runescape-api")
+    implementation project(":injection-annotations")
+}
