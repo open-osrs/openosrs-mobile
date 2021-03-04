@@ -43,7 +43,7 @@ public interface RSClient extends Client
 	GameState getGameState();
 
 	@Import("gameState")
-	int gameState();
+	int getRSGameState();
 
 	@Override
 	@Import("localPlayer")

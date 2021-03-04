@@ -45,6 +45,9 @@ import org.slf4j.LoggerFactory;
 @Mixin(RSClient.class)
 public abstract class RSClientMixin implements RSClient
 {
+	@Shadow("client")
+	private static RSClient client;
+
 	@Inject
 	public static EventBus eventBus = new EventBus();
 
@@ -79,7 +82,7 @@ public abstract class RSClientMixin implements RSClient
 	@Override
 	public GameState getGameState()
 	{
-		return GameState.of(gameState());
+		return GameState.of(client.getRSGameState());
 	}
 
 	@Inject
@@ -103,17 +106,13 @@ public abstract class RSClientMixin implements RSClient
 		return getObjectComposition(id, -1);
 	}
 
-
 	//@FieldHook("gameState")
-	/**
-	 * @todo GameState FieldHook breaks inject
-	 * @body Needs investigating.
-	 */
-	public void onGameStateChanged()
+	// TODO at org.objectweb.asm.Frame.merge: ArrayIndexOutOfBoundsException
+	public static void onGameStateChanged()
 	{
 		GameStateChanged event = new GameStateChanged();
-		event.setGameState(getGameState());
-		getEventBus().post(event);
+		event.setGameState(client.getGameState());
+		eventBus.post(event);
 	}
 }
 
