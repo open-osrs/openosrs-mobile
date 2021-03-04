@@ -35,6 +35,7 @@ import net.runelite.api.mixins.Mixin;
 import net.runelite.api.mixins.Shadow;
 import net.runelite.eventbus.EventBus;
 import net.runelite.rs.api.RSClient;
+import net.runelite.rs.api.RSItemComposition;
 import net.runelite.rs.api.RSObjectComposition;
 import net.runelite.rs.api.RSPacketBuffer;
 import net.runelite.rs.api.RSTileItem;
@@ -106,6 +107,13 @@ public abstract class RSClientMixin implements RSClient
 		return getObjectComposition(id, -1);
 	}
 
+	@Inject
+	@Override
+	public RSItemComposition getItemComposition(int id)
+	{
+		return getItemComposition(id, -1);
+	}
+
 	//@FieldHook("gameState")
 	// TODO at org.objectweb.asm.Frame.merge: ArrayIndexOutOfBoundsException
 	public static void onGameStateChanged()
@@ -113,6 +121,13 @@ public abstract class RSClientMixin implements RSClient
 		GameStateChanged event = new GameStateChanged();
 		event.setGameState(client.getGameState());
 		eventBus.post(event);
+	}
+
+	@Inject
+	@Override
+	public boolean isClientThread()
+	{
+		return true;
 	}
 }
 

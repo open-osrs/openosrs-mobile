@@ -181,6 +181,9 @@ public class InjectHook extends AbstractInjector
 				return;
 			}
 
+			if (fieldBeingSet.getName().equals("ab"))
+				return;
+
 			log.trace("Found injection location for hook {} at instruction {}", hookInfo.method.getName(), sfi);
 			++injectedHooks;
 
@@ -226,7 +229,7 @@ public class InjectHook extends AbstractInjector
 			Code code = ins.getCode();
 			Method method = code.getMethod();
 
-			if (method.getName().equals(CLINIT))
+			if (method.getName().equals(CLINIT) || method.getName().equals("ab"))
 			{
 				return;
 			}
@@ -366,7 +369,7 @@ public class InjectHook extends AbstractInjector
 		{
 			if (objectPusher == null)
 			{
-				throw new InjectException("Null object pusher");
+				throw new InjectException("Null object pusher (check static access)");
 			}
 
 			idx = recursivelyPush(ins, idx, objectPusher);

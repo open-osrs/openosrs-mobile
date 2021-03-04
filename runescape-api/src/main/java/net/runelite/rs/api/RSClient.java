@@ -69,6 +69,16 @@ public interface RSClient extends Client
 	RSObjectComposition getObjectComposition(int objectId, int garbage);
 
 	@Override
+	@Inject
+	RSItemComposition getItemComposition(int itemId);
+
+	@Import("ItemComposition_get")
+	RSItemComposition getItemComposition(int itemId, int garbage);
+
+	@Override
 	@Import("client_plane")
 	int getPlane();
+
+	@Override
+	boolean isClientThread();
 }

@@ -102,6 +102,7 @@ public class MixinInjector extends AbstractInjector
 	{
 		final Map<Provider<ClassFile>, List<ClassFile>> mixinTargets = initTargets();
 		inject(mixinTargets);
+
 	}
 
 	@VisibleForTesting

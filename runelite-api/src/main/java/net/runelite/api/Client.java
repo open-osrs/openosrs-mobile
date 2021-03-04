@@ -61,4 +61,8 @@ public interface Client
 	Scene getScene();
 
 	ObjectComposition getObjectComposition(int objectId);
+
+	boolean isClientThread();
+
+	ItemComposition getItemComposition(int itemId);
 }

@@ -46,6 +46,9 @@ import androidx.annotation.RequiresApi;
 
 import com.jagex.oldscape.android.AndroidLauncher;
 import com.osiris.api.ItemDefinitionManager;
+import com.osiris.game.ItemManager;
+import com.osiris.plugins.PluginManager;
+import com.osiris.util.ExecutorServiceExceptionLogger;
 
 
 import net.runelite.api.Tile;
@@ -55,12 +58,15 @@ import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.eventbus.Subscribe;
+import net.runelite.http.api.RuneLiteAPI;
 import net.runelite.rs.api.RSClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
@@ -92,6 +98,9 @@ public class MainActivity extends Activity {
     private int screenWidth;
     private int screenHeight;
     Map<Tile, List<TileItem>> groundItems = new HashMap<>();
+    public static ScheduledExecutorService executor = new ExecutorServiceExceptionLogger(Executors.newSingleThreadScheduledExecutor());
+    public static ItemManager itemManager;
+
 
     //private final Map<WorldPoint, Integer> offsetMap = new HashMap<>();
 
@@ -147,6 +156,8 @@ public class MainActivity extends Activity {
                 {
                     client.getEventBus().register(this);
                     Log.e(this.getClass().getName(), "EventBus Registered");
+                    itemManager = new ItemManager(client, executor, RuneLiteAPI.CLIENT);
+                    PluginManager.registerPlugins();
                 }
             }
             try {

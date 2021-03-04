@@ -31,6 +31,8 @@ import static net.runelite.deob.util.JarUtil.load;
 import static net.runelite.deob.util.JarUtil.save;
 import java.io.File;
 import java.util.Objects;
+
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
