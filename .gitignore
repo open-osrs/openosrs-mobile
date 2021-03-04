@@ -14,3 +14,4 @@
 /injector/osrs/
 /client/lib/dex-tools-2.1-SNAPSHOT/*.jar
 /client/lib/dex-tools-2.1-SNAPSHOT/*.dex
+*.apk

@@ -27,6 +27,6 @@ package net.runelite.api;
 public interface ItemComposition
 {
     String getName();
-    Boolean isTradeable();
-    Boolean isStackable();
+    boolean isTradeable();
+    boolean isStackable();
 }

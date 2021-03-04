@@ -103,7 +103,12 @@ public abstract class RSClientMixin implements RSClient
 		return getObjectComposition(id, -1);
 	}
 
-	@FieldHook("gameState")
+
+	//@FieldHook("gameState")
+	/**
+	 * @todo GameState FieldHook breaks inject
+	 * @body Needs investigating.
+	 */
 	public void onGameStateChanged()
 	{
 		GameStateChanged event = new GameStateChanged();
