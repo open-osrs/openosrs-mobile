@@ -25,7 +25,6 @@
 package net.runelite.rs.api;
 
 import net.runelite.api.ItemComposition;
-import net.runelite.api.ObjectComposition;
 import net.runelite.mapping.Import;
 
 public interface RSItemComposition extends ItemComposition
@@ -35,10 +34,10 @@ public interface RSItemComposition extends ItemComposition
     String getName();
 
     @Override
-    @Import("tradeable")
-    Boolean isTradeable();
+    @Import("isTradeable") //TODO: Confirm (There are only 2 bools here)
+    boolean isTradeable();
 
     @Override
-    @Import("tradeable")
-    Boolean isStackable();
+    @Import("isStackable") //TODO: Confirm
+    boolean isStackable();
 }
