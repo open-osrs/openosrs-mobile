@@ -209,7 +209,7 @@ public class InjectHook extends AbstractInjector
 			}
 			catch (InjectException ex)
 			{
-				log.error("Could not hook " + hookInfo.method.getName() + " at " + sfi);
+				log.error("Could not hook " + hookInfo.method.getName() + " at " + sfi + " - (check static access)");
 				throw new RuntimeException(ex);
 			}
 		});

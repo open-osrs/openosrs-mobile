@@ -106,7 +106,7 @@ public abstract class RSClientMixin implements RSClient
 		return getObjectComposition(id, -1);
 	}
 
-	//@FieldHook("gameState")
+	@FieldHook("gameState")
 	// TODO at org.objectweb.asm.Frame.merge: ArrayIndexOutOfBoundsException
 	public static void onGameStateChanged()
 	{
