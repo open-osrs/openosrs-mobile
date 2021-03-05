@@ -77,6 +77,9 @@ public interface RSClient extends Client
 
 	@Override
 	@Import("client_plane")
+	int getRSPlane();
+
+	@Override
 	int getPlane();
 
 	@Override

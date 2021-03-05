@@ -64,4 +64,7 @@ public interface RSItemComposition extends ItemComposition
     @Import("isTradable")
     @Override
     boolean isTradeable();
+
+    @Import("isStackable")
+    int getIsStackable();
 }

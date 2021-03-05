@@ -75,33 +75,37 @@ android {
     }
 
     task patchGoogle1(type: Copy) {
-        from file("./client-debug/smali/com/google/common/collect/")
-        into file("./osrs/smali/com/google/common/collect/")
+        from file("./osrs/smali/com/google/android/")
+        into file("./client-debug/smali/com/google/android/")
+        eachFile { if (it.relativePath.getFile(destinationDir).exists()) it.exclude() }
     }
 
     task patchGoogle2(type: Copy) {
-        from file("./client-debug/smali/com/google/errorprone/")
-        into file("./osrs/smali/com/google/errorprone/")
+        from file("./osrs/smali/com/google/auto/")
+        into file("./client-debug/smali/com/google/auto/")
+        eachFile { if (it.relativePath.getFile(destinationDir).exists()) it.exclude() }
     }
 
     task patchGoogle3(type: Copy) {
-        from file("./client-debug/smali/com/google/common/base/Preconditions.smali")
-        into file("./osrs/smali/com/google/common/base/Preconditions.smali")
+        from file("./osrs/smali/com/google/firebase/")
+        into file("./client-debug/smali/com/google/firebase/")
+        eachFile { if (it.relativePath.getFile(destinationDir).exists()) it.exclude() }
     }
 
     task patchGoogle4(type: Copy) {
-        from file("./client-debug/smali/com/google/common/cache/")
-        into file("./osrs/smali/com/google/common/cache/")
+        from file("./osrs/smali/com/google/gson/")
+        into file("./client-debug/smali/com/google/gson/")
+        eachFile { if (it.relativePath.getFile(destinationDir).exists()) it.exclude() }
     }
 
-    task patchGoogle5(type: Copy) {
-        from file("./client-debug/smali/com/google/common/base/Suppliers.smali")
-        into file("./osrs/smali/com/google/common/cache/base/")
+    task patchGoogle5(type: Delete) {
+        delete "./osrs/smali/com/google/"
+        followSymlinks = false
     }
 
     task patchGoogle6(type: Copy) {
-        from file("./client-debug/smali/com/google/common/base/Suppliers**")
-        into file("./osrs/smali/com/google/common/cache/base/")
+        from file("./client-debug/smali/com/google/")
+        into file("./osrs/smali/com/google/")
     }
 
     task patchOkhttp(type: Copy) {

@@ -48,6 +48,7 @@ import com.jagex.oldscape.android.AndroidLauncher;
 import com.osiris.api.ItemDefinitionManager;
 import com.osiris.game.ItemManager;
 import com.osiris.plugins.PluginManager;
+import com.osiris.plugins.grounditems.GroundItemsPlugin;
 import com.osiris.util.ExecutorServiceExceptionLogger;
 
 
@@ -57,13 +58,19 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
+import net.runelite.api.events.PostItemComposition;
 import net.runelite.eventbus.Subscribe;
 import net.runelite.http.api.RuneLiteAPI;
+import net.runelite.http.api.item.ItemClient;
 import net.runelite.rs.api.RSClient;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -80,6 +87,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
     move that package to osrs mobile.
  */
 public class MainActivity extends Activity {
+    public String MAIN_ACTIVITY = this.getClass().getName();
     private String version = "0.1.0";
     static int gameTicks = 0;
     public static RSClient client;
@@ -100,6 +108,7 @@ public class MainActivity extends Activity {
     Map<Tile, List<TileItem>> groundItems = new HashMap<>();
     public static ScheduledExecutorService executor = new ExecutorServiceExceptionLogger(Executors.newSingleThreadScheduledExecutor());
     public static ItemManager itemManager;
+    public static InputStream itemVariations;
 
 
     //private final Map<WorldPoint, Integer> offsetMap = new HashMap<>();
@@ -129,6 +138,11 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "Overlay permission required for OSiris. Exiting...", Toast.LENGTH_SHORT).show();
             return;
         }
+        try {
+            itemVariations = this.getResources().getAssets().open("item_variations.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         rsRegular = Typeface.createFromAsset(this.getResources().getAssets(), "runescape.ttf");
         rsSmall = Typeface.createFromAsset(this.getResources().getAssets(), "runescape_small.ttf");
 
@@ -155,9 +169,9 @@ public class MainActivity extends Activity {
                 if (client != null)
                 {
                     client.getEventBus().register(this);
-                    Log.e(this.getClass().getName(), "EventBus Registered");
-                    itemManager = new ItemManager(client, executor, RuneLiteAPI.CLIENT);
                     PluginManager.registerPlugins();
+                    Log.e(MAIN_ACTIVITY, "EventBus Registered");
+                    itemManager = new ItemManager(client, executor, RuneLiteAPI.CLIENT);
                 }
             }
             try {
@@ -211,9 +225,15 @@ public class MainActivity extends Activity {
     }
 
     @Subscribe
+    public void onPostItemComposition(PostItemComposition event)
+    {
+        Log.e(MAIN_ACTIVITY, event.getItemComposition().getName() + " composition posted!");
+    }
+
+    @Subscribe
     public void onGameTick(GameTick event)
     {
-        Log.e(this.getClass().getName(), "onGameTick!");
+        Log.e(MAIN_ACTIVITY, "onGameTick!");
     }
 
     @Subscribe
@@ -222,8 +242,7 @@ public class MainActivity extends Activity {
         groundItems.get(event.getTile()).add(event.getItem());
         if (groundItems.get(event.getTile()).size() == 0)
             groundItems.remove(event.getTile());
-
-        Log.e(this.getClass().getName(), "onItemDespawned!");
+        Log.e(MAIN_ACTIVITY, itemManager.getItemComposition(event.getItem().getId()).getName() + " Despawned");
     }
 
     @Subscribe
@@ -231,7 +250,7 @@ public class MainActivity extends Activity {
     {
         groundItems.get(event.getTile()).remove(event.getItem());
         groundItems.get(event.getTile()).add(event.getItem());
-        Log.e(this.getClass().getName(), "onItemQuantityChanged!");
+        Log.e(MAIN_ACTIVITY, itemManager.getItemComposition(event.getItem().getId()).getName() + " Quantity Changed");
     }
 
     @Subscribe
@@ -244,7 +263,14 @@ public class MainActivity extends Activity {
             groundItems.put(event.getTile(), tileItemList);
         }
         else groundItems.get(event.getTile()).add(event.getItem());
-        Log.e(this.getClass().getName(), "onItemSpawned!");
+        String alchValue = NumberFormat.getNumberInstance(Locale.US).format(
+                client.getItemComposition(event.getItem().getId()).getPrice() * event.getItem().getQuantity());
+        String geValue = NumberFormat.getNumberInstance(Locale.US).format(
+                itemManager.getItemPrice(event.getItem().getId())  * event.getItem().getQuantity());
+        Log.e(MAIN_ACTIVITY, itemManager.getItemComposition(event.getItem().getId()).getName()
+                + " x" + event.getItem().getQuantity()
+                + " Spawned, worth - (HA:" + alchValue
+                + ")(GE:" + geValue + ")");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -259,6 +285,7 @@ public class MainActivity extends Activity {
             overlayBitmap.eraseColor(Color.TRANSPARENT);
             overlayBitmap = drawTextToBitmap(overlayBitmap, "OSiris", 0, 0);
             overlayBitmap = drawTextToBitmap(overlayBitmap, version, 0, 14 * 4);
+            debug[0] = "ItemPrices: " + ItemManager.itemPrices.size();
 
             int i = 0;
             for (String s : debug)

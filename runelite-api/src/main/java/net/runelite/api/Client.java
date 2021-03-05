@@ -50,6 +50,8 @@ public interface Client
 
 	int getBaseY();
 
+	int getRSPlane();
+
 	int getPlane();
 
 	boolean isInInstancedRegion();

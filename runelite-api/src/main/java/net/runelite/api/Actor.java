@@ -26,5 +26,6 @@ package net.runelite.api;
 
 public interface Actor
 {
-
+    int getX();
+    int getY();
 }

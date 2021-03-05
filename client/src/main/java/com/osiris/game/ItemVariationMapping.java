@@ -30,6 +30,8 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.osiris.MainActivity;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -53,7 +55,7 @@ public class ItemVariationMapping
 		{
 		};
 
-		final InputStream geLimitData = ItemVariationMapping.class.getResourceAsStream("/item_variations.json");
+		final InputStream geLimitData = MainActivity.itemVariations;
 		final Map<String, Collection<Integer>> itemVariations = gson.fromJson(new InputStreamReader(geLimitData, StandardCharsets.UTF_8), typeToken.getType());
 
 		ImmutableMap.Builder<Integer, Integer> builder = new ImmutableMap.Builder<>();

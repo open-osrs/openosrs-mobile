@@ -64,7 +64,7 @@ public class ItemClient
 		{
 			if (!response.isSuccessful())
 			{
-				log.warn("Error looking up prices: {}", response);
+				log.error("Error looking up prices: {}", response);
 				return null;
 			}
 

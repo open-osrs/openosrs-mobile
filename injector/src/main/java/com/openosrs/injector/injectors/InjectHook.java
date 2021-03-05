@@ -229,7 +229,7 @@ public class InjectHook extends AbstractInjector
 			Code code = ins.getCode();
 			Method method = code.getMethod();
 
-			if (method.getName().equals(CLINIT) || method.getName().equals("ab"))
+			if (method.getName().equals(CLINIT))
 			{
 				return;
 			}

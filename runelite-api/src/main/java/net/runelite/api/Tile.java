@@ -24,6 +24,8 @@
  */
 package net.runelite.api;
 
+import net.runelite.api.coords.WorldPoint;
+
 public interface Tile extends TileObject
 {
     boolean hasLineOfSightTo(Tile targetTile);
@@ -31,4 +33,5 @@ public interface Tile extends TileObject
     int getX();
     int getY();
 
+    WorldPoint getWorldLocation();
 }

@@ -27,6 +27,7 @@ package net.runelite.mixins;
 
 import net.runelite.api.Constants;
 import net.runelite.api.GameState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.mixins.FieldHook;
@@ -149,6 +150,13 @@ public abstract class RSTileMixin implements RSTile
 			ItemSpawned event = new ItemSpawned(this, current);
 			client.getEventBus().post(event);
 		}
+	}
+
+	@Inject
+	@Override
+	public WorldPoint getWorldLocation()
+	{
+		return new WorldPoint(getX(), getY(), client.getPlane());
 	}
 }
 

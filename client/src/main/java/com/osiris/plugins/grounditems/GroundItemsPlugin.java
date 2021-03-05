@@ -1,8 +1,6 @@
 package com.osiris.plugins.grounditems;
 
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.ImmutableList;
 import com.osiris.MainActivity;
 import com.osiris.plugins.Plugin;
 
@@ -37,7 +35,7 @@ public class GroundItemsPlugin extends Plugin {
     private int lastUsedItem;
 
     @Getter
-    private final Map<GroundItem.GroundItemKey, GroundItem> collectedGroundItems = new LinkedHashMap<>();
+    public static Map<GroundItem.GroundItemKey, GroundItem> collectedGroundItems = new LinkedHashMap<>();
     private final Queue<Integer> droppedItemQueue = EvictingQueue.create(16); // recently dropped items
 
     @Subscribe
@@ -116,7 +114,7 @@ public class GroundItemsPlugin extends Plugin {
         final int itemId = item.getId();
         final ItemComposition itemComposition = MainActivity.itemManager.getItemComposition(itemId);
         final int realItemId = itemComposition.getNote() != -1 ? itemComposition.getLinkedNoteId() : itemId;
-        final int alchPrice = itemComposition.getHaPrice();
+        final int alchPrice = itemComposition.getPrice();
         final boolean dropped = tile.getWorldLocation().equals(client.getLocalPlayer().getWorldLocation()) && droppedItemQueue.remove(itemId);
         final boolean table = itemId == lastUsedItem && tile.getItemLayer().getHeight() > 0;
 

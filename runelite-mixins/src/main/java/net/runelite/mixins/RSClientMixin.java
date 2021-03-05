@@ -56,6 +56,9 @@ public abstract class RSClientMixin implements RSClient
 	public static Logger logger = LoggerFactory.getLogger("master");
 
 	@Inject
+	public int plane;
+
+	@Inject
 	@Override
 	public Logger getLogger()
 	{
@@ -128,6 +131,15 @@ public abstract class RSClientMixin implements RSClient
 	public boolean isClientThread()
 	{
 		return true;
+	}
+
+	@Inject
+	@Override
+	public int getPlane()
+	{
+		plane = getRSPlane();
+		plane *= -660826149;
+		return plane;
 	}
 }
 

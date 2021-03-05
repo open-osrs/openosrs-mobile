@@ -39,7 +39,7 @@ public abstract class RSTileItemMixin implements RSTileItem
 		}
 
 		Tile[][][] tiles = client.getScene().getTiles();
-		return tiles[client.getPlane()][x][y];
+		return tiles[client.getRSPlane()][x][y];
 	}
 
 	@Inject

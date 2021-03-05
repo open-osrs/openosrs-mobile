@@ -57,7 +57,7 @@ public class WorldPoint
 	/**
 	 * The plane level of the Tile, also referred as z-axis coordinate.
 	 *
-	 * @see Client#getPlane()
+	 * @see Client#getRSPlane()
 	 */
 	private final int plane;
 
@@ -121,7 +121,7 @@ public class WorldPoint
 	 */
 	public boolean isInScene(Client client)
 	{
-		return client.getPlane() == plane && isInScene(client, x, y);
+		return client.getRSPlane() == plane && isInScene(client, x, y);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class WorldPoint
 	 */
 	public static WorldPoint fromLocal(Client client, LocalPoint local)
 	{
-		return fromLocal(client, local.getX(), local.getY(), client.getPlane());
+		return fromLocal(client, local.getX(), local.getY(), client.getRSPlane());
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class WorldPoint
 	 */
 	public static WorldPoint fromLocalInstance(Client client, LocalPoint localPoint)
 	{
-		return fromLocalInstance(client, localPoint, client.getPlane());
+		return fromLocalInstance(client, localPoint, client.getRSPlane());
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class WorldPoint
 
 			// get the template chunk for the chunk
 			int[][][] instanceTemplateChunks = client.getInstanceTemplateChunks();
-			int templateChunk = instanceTemplateChunks[client.getPlane()][chunkX][chunkY];
+			int templateChunk = instanceTemplateChunks[client.getRSPlane()][chunkX][chunkY];
 
 			int rotation = templateChunk >> 1 & 0x3;
 			int templateChunkY = (templateChunk >> 3 & 0x7FF) * CHUNK_SIZE;

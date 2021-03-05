@@ -28,7 +28,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
-import com.osiris.BuildConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ import net.runelite.api.ItemComposition;
 import static net.runelite.api.ItemID.*;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.PostItemComposition;
-import net.runelite.eventbus.EventBus;
 import net.runelite.eventbus.Subscribe;
 import net.runelite.http.api.item.ItemClient;
 import net.runelite.http.api.item.ItemPrice;
@@ -62,7 +60,7 @@ public class ItemManager
 	private final Client client;
 	private final ItemClient itemClient;
 
-	private Map<Integer, ItemPrice> itemPrices = Collections.emptyMap();
+	public static Map<Integer, ItemPrice> itemPrices = Collections.emptyMap();
 	private Map<Integer, ItemStats> itemStats = Collections.emptyMap();
 	private final LoadingCache<Integer, ItemComposition> itemCompositions;
 
@@ -147,8 +145,7 @@ public class ItemManager
 		this.client = client;
 		this.itemClient = new ItemClient(okHttpClient);
 
-		scheduledExecutorService.scheduleWithFixedDelay(this::loadPrices, 0, 30, TimeUnit.MINUTES);
-		scheduledExecutorService.submit(this::loadStats);
+		loadPrices();
 
 		itemCompositions = CacheBuilder.newBuilder()
 			.maximumSize(1024L)
@@ -306,7 +303,7 @@ public class ItemManager
 			return 1000;
 		}
 
-		return Math.max(1, composition.getHaPrice());
+		return Math.max(1, composition.getPrice());
 	}
 
 	public int getRepairValue(int itemId)

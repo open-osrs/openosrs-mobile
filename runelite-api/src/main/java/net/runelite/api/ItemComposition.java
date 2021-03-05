@@ -31,7 +31,6 @@ public interface ItemComposition
     boolean isStackable();
     int getNote();
     int getLinkedNoteId();
-    int getHaPrice();
     int getId();
     int getPlaceholderId();
     int getPlaceholderTemplateId();

@@ -7,7 +7,6 @@ import net.runelite.api.mixins.Mixin;
 import net.runelite.api.mixins.Shadow;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSItemComposition;
-import net.runelite.rs.api.RSNode;
 
 @Mixin(RSItemComposition.class)
 public abstract class RSItemCompositionMixin implements RSItemComposition
@@ -23,5 +22,12 @@ public abstract class RSItemCompositionMixin implements RSItemComposition
         final PostItemComposition event = new PostItemComposition();
         event.setItemComposition(this);
         client.getEventBus().post(event);
+    }
+
+    @Inject
+    @Override
+    public boolean isStackable()
+    {
+        return getIsStackable() != 0;
     }
 }

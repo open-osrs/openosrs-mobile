@@ -25,8 +25,16 @@
 package net.runelite.rs.api;
 
 import net.runelite.api.Actor;
+import net.runelite.mapping.Import;
 
 public interface RSActor extends Actor
 {
 
+    @Override
+    @Import("x")
+    int getX();
+
+    @Override
+    @Import("y")
+    int getY();
 }
