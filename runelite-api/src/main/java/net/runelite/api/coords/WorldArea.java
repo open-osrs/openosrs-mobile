@@ -397,7 +397,7 @@ public class WorldArea
 			for (int x = startX; x <= endX; x++)
 			{
 				if ((collisionDataFlags[x][checkY] & yFlags) != 0 ||
-					!extraCondition.test(WorldPoint.fromScene(client, x, checkY, client.getRSPlane())))
+					!extraCondition.test(WorldPoint.fromScene(client, x, checkY, client.getPlane())))
 				{
 					// Collision while attempting to travel along the y axis
 					return false;
@@ -425,7 +425,7 @@ public class WorldArea
 		if (dx != 0 && dy != 0)
 		{
 			if ((collisionDataFlags[checkX][checkY] & xyFlags) != 0 ||
-				!extraCondition.test(WorldPoint.fromScene(client, checkX, checkY, client.getRSPlane())))
+				!extraCondition.test(WorldPoint.fromScene(client, checkX, checkY, client.getPlane())))
 			{
 				// Collision while attempting to travel diagonally
 				return false;
@@ -437,7 +437,7 @@ public class WorldArea
 			if (width == 1)
 			{
 				if ((collisionDataFlags[checkX][checkY - dy] & xFlags) != 0 &&
-					extraCondition.test(WorldPoint.fromScene(client, checkX, startY, client.getRSPlane())))
+					extraCondition.test(WorldPoint.fromScene(client, checkX, startY, client.getPlane())))
 				{
 					return false;
 				}
@@ -445,7 +445,7 @@ public class WorldArea
 			if (height == 1)
 			{
 				return (collisionDataFlags[checkX - dx][checkY] & yFlags) == 0 ||
-					!extraCondition.test(WorldPoint.fromScene(client, startX, checkY, client.getRSPlane()));
+					!extraCondition.test(WorldPoint.fromScene(client, startX, checkY, client.getPlane()));
 			}
 		}
 
