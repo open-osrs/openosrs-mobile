@@ -285,7 +285,7 @@ public class MainActivity extends Activity {
             overlayBitmap.eraseColor(Color.TRANSPARENT);
             overlayBitmap = drawTextToBitmap(overlayBitmap, "OSiris", 0, 0);
             overlayBitmap = drawTextToBitmap(overlayBitmap, version, 0, 14 * 4);
-            debug[0] = "ItemPrices: " + ItemManager.itemPrices.size();
+            debug[0] = "GroundItems: " + GroundItemsPlugin.collectedGroundItems.size();
 
             int i = 0;
             for (String s : debug)

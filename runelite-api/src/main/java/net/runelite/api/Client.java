@@ -67,4 +67,30 @@ public interface Client
 	boolean isClientThread();
 
 	ItemComposition getItemComposition(int itemId);
+
+	int[][][] getTileHeights();
+
+	byte[][][] getTileSettings();
+
+	int getOverlayWidth();
+	int getOverlayHeight();
+
+	void setOverlayWidth(int width);
+	void setOverlayHeight(int height);
+
+	int getCameraZ();
+
+	int getCameraPitch();
+
+	int getCameraYaw();
+
+	int getCameraY();
+
+	int getCameraX();
+
+	int getCameraZoom();
+
+	int getViewportWidth();
+
+	int getViewportHeight();
 }

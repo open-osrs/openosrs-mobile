@@ -7,7 +7,7 @@ public class ExtractInjectedJar {
 
     public static void main(String[] args)
     {
-        String source = "./build/libs/injected-client.jar";
+        String source = "./lib/injected-client.jar";
         String destination = "./tmp/injected/";
         try {
             ZipFile zipFile = new ZipFile(source);

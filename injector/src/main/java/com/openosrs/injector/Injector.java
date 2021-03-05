@@ -41,7 +41,7 @@ public class Injector extends InjectData implements InjectTaskHandler
 	static final Logger log = LoggerFactory.getLogger(Injector.class.getName());
 	static Injector injector = new Injector();
 	static File injectedClient =
-		new File("./build/libs/injected-client.jar");
+		new File("./lib/injected-client.jar");
 
 	public static void main(String[] args)
 	{

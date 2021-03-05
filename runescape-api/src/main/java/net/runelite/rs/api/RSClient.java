@@ -84,4 +84,48 @@ public interface RSClient extends Client
 
 	@Override
 	boolean isClientThread();
+
+	@Override
+	int getOverlayWidth();
+
+	@Override
+	int getOverlayHeight();
+
+	@Override
+	void setOverlayWidth(int width);
+
+	@Override
+	void setOverlayHeight(int height);
+
+	@Override
+	@Import("cameraZ")
+	int getCameraZ();
+
+	@Override
+	@Import("cameraPitch")
+	int getCameraPitch();
+
+	@Override
+	@Import("cameraYaw")
+	int getCameraYaw();
+
+	@Override
+	@Import("cameraY")
+	int getCameraY();
+
+	@Override
+	@Import("cameraX")
+	int getCameraX();
+
+	@Override
+	@Import("viewportZoom")
+	int getCameraZoom();
+
+	@Override
+	@Import("viewportWidth")
+	int getViewportWidth();
+
+	@Override
+	@Import("viewportHeight")
+	int getViewportHeight();
 }

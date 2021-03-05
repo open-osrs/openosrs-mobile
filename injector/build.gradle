@@ -26,7 +26,7 @@ dependencies {
 }
 
 task decodeVanillaDex(type: JavaExec) {
-    classpath = files('./lib/apktool_2.4.1.jar')
+    classpath = files('./lib/apktool_2.5.0.jar')
     main = 'brut.apktool.Main'
     args 'd','-f','-s', './lib/osrs.apk'
 }
@@ -70,7 +70,7 @@ task patchedJarToDex(type: JavaExec) {
 }
 
 task assembleInjected(type: JavaExec) {
-    classpath = files('./lib/apktool_2.4.1.jar')
+    classpath = files('./lib/apktool_2.5.0.jar')
     main = 'brut.apktool.Main'
     args 'b','-f','./osrs/'
 }

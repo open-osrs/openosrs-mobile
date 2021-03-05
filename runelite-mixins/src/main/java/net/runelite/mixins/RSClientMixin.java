@@ -28,7 +28,6 @@ package net.runelite.mixins;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.mixins.FieldHook;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.MethodHook;
 import net.runelite.api.mixins.Mixin;
@@ -57,6 +56,12 @@ public abstract class RSClientMixin implements RSClient
 
 	@Inject
 	public int plane;
+
+	@Inject
+	public int overlayWidth;
+
+	@Inject
+	public int overlayHeight;
 
 	@Inject
 	@Override
@@ -140,6 +145,34 @@ public abstract class RSClientMixin implements RSClient
 		plane = getRSPlane();
 		plane *= -660826149;
 		return plane;
+	}
+
+	@Inject
+	@Override
+	public void setOverlayWidth(int width)
+	{
+		overlayWidth = width;
+	}
+
+	@Inject
+	@Override
+	public void setOverlayHeight(int height)
+	{
+		overlayHeight = height;
+	}
+
+	@Inject
+	@Override
+	public int getOverlayHeight()
+	{
+		return overlayHeight;
+	}
+
+	@Inject
+	@Override
+	public int getOverlayWidth()
+	{
+		return overlayWidth;
 	}
 }
 
