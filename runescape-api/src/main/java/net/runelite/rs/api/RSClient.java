@@ -69,6 +69,88 @@ public interface RSClient extends Client
 	RSObjectComposition getObjectComposition(int objectId, int garbage);
 
 	@Override
+	@Inject
+	RSItemComposition getItemComposition(int itemId);
+
+	@Import("ItemComposition_get")
+	RSItemComposition getItemComposition(int itemId, int garbage);
+
+	@Override
 	@Import("client_plane")
+	int getRSPlane();
+
+	@Override
 	int getPlane();
+
+	@Override
+	boolean isClientThread();
+
+	@Override
+	int getOverlayWidth();
+
+	@Override
+	int getOverlayHeight();
+
+	@Override
+	void setOverlayWidth(int width);
+
+	@Override
+	void setOverlayHeight(int height);
+
+	@Override
+	@Import("cameraZ")
+	int getCameraZ();
+
+	@Override
+	@Import("cameraPitch")
+	int getCameraPitch();
+
+	@Override
+	@Import("cameraYaw")
+	int getCameraYaw();
+
+	@Override
+	@Import("cameraY")
+	int getCameraY();
+
+	@Override
+	@Import("cameraX")
+	int getCameraX();
+
+	@Override
+	@Import("viewportZoom")
+	int getCameraZoom();
+
+	@Override
+	@Import("viewportWidth")
+	int getViewportWidth();
+
+	@Override
+	@Import("viewportHeight")
+	int getViewportHeight();
+
+	@Override
+	@Import("baseX")
+	int getBaseX();
+
+	@Override
+	@Import("baseY")
+	int getBaseY();
+
+	@Import("Tiles_heights")
+	@Override
+	int[][][] getTileHeights();
+
+	@Import("Tiles_renderFlags")
+	@Override
+	byte[][][] getTileSettings();
+
+	@Override
+	String[] getDebugLines();
+
+	@Override
+	void setDebugLines(String[] debugLines);
+
+	@Override
+	boolean drawCheapGroundItems();
 }

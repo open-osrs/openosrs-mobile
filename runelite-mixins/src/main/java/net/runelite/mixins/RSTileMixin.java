@@ -27,6 +27,7 @@ package net.runelite.mixins;
 
 import net.runelite.api.Constants;
 import net.runelite.api.GameState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.mixins.FieldHook;
@@ -60,14 +61,12 @@ public abstract class RSTileMixin implements RSTile
 
 		RSNodeDeque oldQueue = lastGroundItems[z][x][y];
 		RSNodeDeque newQueue = groundItemDeque[z][x][y];
-		System.out.println("test1");
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
 			lastGroundItems[z][x][y] = newQueue;
 			client.setLastItemDespawn(null);
 			return;
 		}
-		System.out.println("test2");
 		if (oldQueue != newQueue)
 		{
 			if (oldQueue != null)
@@ -149,6 +148,13 @@ public abstract class RSTileMixin implements RSTile
 			ItemSpawned event = new ItemSpawned(this, current);
 			client.getEventBus().post(event);
 		}
+	}
+
+	@Inject
+	@Override
+	public WorldPoint getWorldLocation()
+	{
+		return WorldPoint.fromScene(client, getX(), getY(), getPlane());
 	}
 }
 

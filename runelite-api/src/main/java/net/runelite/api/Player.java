@@ -24,7 +24,11 @@
  */
 package net.runelite.api;
 
-public interface Player
+import net.runelite.api.coords.WorldPoint;
+
+public interface Player extends Actor
 {
 	Username getUsernameContainer();
+
+	WorldPoint getWorldLocation();
 }

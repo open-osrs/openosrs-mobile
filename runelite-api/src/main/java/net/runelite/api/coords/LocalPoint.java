@@ -56,7 +56,7 @@ public class LocalPoint
 	@Nullable
 	public static LocalPoint fromWorld(Client client, WorldPoint world)
 	{
-		if (client.getPlane() != world.getPlane())
+		if (client.getRSPlane() != world.getPlane())
 		{
 			return null;
 		}

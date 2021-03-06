@@ -10,6 +10,7 @@
     <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <application android:allowBackup="false" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:fullBackupContent="@xml/appsflyer_backup_rules" android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher" android:isGame="true" android:label="@string/app_name" android:largeHeap="true" android:networkSecurityConfig="@xml/network_security_config" android:resizeableActivity="true" android:theme="@style/Platform.MaterialComponents">
+        android:debuggable="true"
         <meta-data android:name="android.max_aspect" android:value="2.4"/>
         <activity android:configChanges="density|keyboard|keyboardHidden|locale|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" android:immersive="true" android:label="OSiris" android:launchMode="singleTop" android:name="com.osiris.MainActivity" android:screenOrientation="sensorLandscape">
             <meta-data android:name="android.app.lib_name" android:value="osrenderer"/>

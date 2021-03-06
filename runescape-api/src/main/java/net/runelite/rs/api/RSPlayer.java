@@ -25,11 +25,15 @@
 package net.runelite.rs.api;
 
 import net.runelite.api.Player;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.mapping.Import;
 
-public interface RSPlayer extends Player
+public interface RSPlayer extends RSActor, Player
 {
 	@Override
 	@Import("username")
     RSUsername getUsernameContainer();
+
+	@Override
+	WorldPoint getWorldLocation();
 }

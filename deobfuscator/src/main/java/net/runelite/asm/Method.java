@@ -29,6 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 import net.runelite.asm.attributes.Annotated;
 import net.runelite.asm.attributes.Code;
 import net.runelite.asm.attributes.Exceptions;
@@ -48,6 +50,7 @@ import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.ACC_SYNCHRONIZED;
 
+@Slf4j
 public class Method implements Annotated, Named
 {
 	public static final int ACCESS_MODIFIERS = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED;
@@ -158,7 +161,16 @@ public class Method implements Annotated, Named
 				}
 			}
 
-			visitor.visitMaxs(code.getMaxStack(), code.getMaxLocals());
+			try
+			{
+				visitor.visitMaxs(code.getMaxStack(), code.getMaxLocals());
+			}
+			catch (Exception e)
+			{
+				log.error(code.getMethod().getClassFile().getName() + ":" + code.getMethod().getName() + " FieldHook invalid!");
+				e.printStackTrace();
+				System.exit(-1);
+			}
 		}
 
 		visitor.visitEnd();

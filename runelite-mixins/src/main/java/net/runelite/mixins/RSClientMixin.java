@@ -28,13 +28,15 @@ package net.runelite.mixins;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.mixins.FieldHook;
+import net.runelite.api.mixins.Copy;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.MethodHook;
 import net.runelite.api.mixins.Mixin;
+import net.runelite.api.mixins.Replace;
 import net.runelite.api.mixins.Shadow;
 import net.runelite.eventbus.EventBus;
 import net.runelite.rs.api.RSClient;
+import net.runelite.rs.api.RSItemComposition;
 import net.runelite.rs.api.RSObjectComposition;
 import net.runelite.rs.api.RSPacketBuffer;
 import net.runelite.rs.api.RSTileItem;
@@ -53,6 +55,21 @@ public abstract class RSClientMixin implements RSClient
 
 	@Inject
 	public static Logger logger = LoggerFactory.getLogger("master");
+
+	@Inject
+	public int plane;
+
+	@Inject
+	public int overlayWidth;
+
+	@Inject
+	public int overlayHeight;
+
+	@Inject
+	private String[] debugLines = new String[10];
+
+	@Inject
+	private static boolean isDrawCheapGroundItems = false;
 
 	@Inject
 	@Override
@@ -106,6 +123,13 @@ public abstract class RSClientMixin implements RSClient
 		return getObjectComposition(id, -1);
 	}
 
+	@Inject
+	@Override
+	public RSItemComposition getItemComposition(int id)
+	{
+		return getItemComposition(id, -1);
+	}
+
 	//@FieldHook("gameState")
 	// TODO at org.objectweb.asm.Frame.merge: ArrayIndexOutOfBoundsException
 	public static void onGameStateChanged()
@@ -113,6 +137,95 @@ public abstract class RSClientMixin implements RSClient
 		GameStateChanged event = new GameStateChanged();
 		event.setGameState(client.getGameState());
 		eventBus.post(event);
+	}
+
+	@Inject
+	@Override
+	public boolean isClientThread()
+	{
+		return true;
+	}
+
+	@Inject
+	@Override
+	public int getPlane()
+	{
+		plane = getRSPlane();
+		plane *= -660826149;
+		if (plane < 0)
+			return 0;
+		return plane;
+	}
+
+	@Inject
+	@Override
+	public void setOverlayWidth(int width)
+	{
+		overlayWidth = width;
+	}
+
+	@Inject
+	@Override
+	public void setOverlayHeight(int height)
+	{
+		overlayHeight = height;
+	}
+
+	@Inject
+	@Override
+	public int getOverlayHeight()
+	{
+		return overlayHeight;
+	}
+
+	@Inject
+	@Override
+	public int getOverlayWidth()
+	{
+		return overlayWidth;
+	}
+
+	@Inject
+	@Override
+	public String[] getDebugLines()
+	{
+		return debugLines;
+	}
+
+	@Inject
+	@Override
+	public void setDebugLines(String[] debugLines)
+	{
+		this.debugLines = debugLines;
+	}
+
+	@Copy("doCheat")
+	public static void rs$doCheat(String command, int garbage)
+	{
+
+	}
+	//This is where the bubble will be toggled on and off, the entry way to plugin configuration
+	@Replace("doCheat")
+	public static void rl$doCheat(String command, int garbage)
+	{
+		//Open OSiris config bubble here
+		if (command.equals("config"))
+		{
+			return;
+		}
+		else if (command.equals("items.drawcheap"))
+		{
+			isDrawCheapGroundItems = !isDrawCheapGroundItems;
+			return;
+		}
+		rs$doCheat(command, garbage);
+	}
+
+	@Inject
+	@Override
+	public boolean drawCheapGroundItems()
+	{
+		return isDrawCheapGroundItems;
 	}
 }
 

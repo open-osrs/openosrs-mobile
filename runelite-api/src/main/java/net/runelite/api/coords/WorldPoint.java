@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Value;
 import net.runelite.api.Client;
 import static net.runelite.api.Constants.CHUNK_SIZE;
@@ -41,25 +44,26 @@ import net.runelite.api.Perspective;
  * WorldPoints are immutable. Methods that modify the properties create a new
  * instance.
  */
-@Value
+@AllArgsConstructor
+@Data
 public class WorldPoint
 {
 	/**
 	 * X-axis coordinate.
 	 */
-	private final int x;
+	private int x;
 
 	/**
 	 * Y-axis coordinate.
 	 */
-	private final int y;
+	private int y;
 
 	/**
 	 * The plane level of the Tile, also referred as z-axis coordinate.
 	 *
-	 * @see Client#getPlane()
+	 * @see Client#getRSPlane()
 	 */
-	private final int plane;
+	private int plane;
 
 	/**
 	 * Offsets the x-axis coordinate by the passed value.

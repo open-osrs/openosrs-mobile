@@ -31,6 +31,8 @@ import static net.runelite.deob.util.JarUtil.load;
 import static net.runelite.deob.util.JarUtil.save;
 import java.io.File;
 import java.util.Objects;
+
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class Injector extends InjectData implements InjectTaskHandler
 	static final Logger log = LoggerFactory.getLogger(Injector.class.getName());
 	static Injector injector = new Injector();
 	static File injectedClient =
-		new File("./build/libs/injected-client.jar");
+		new File("./lib/injected-client.jar");
 
 	public static void main(String[] args)
 	{

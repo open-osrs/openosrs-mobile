@@ -26,6 +26,7 @@ package net.runelite.rs.api;
 
 import net.runelite.api.Player;
 import net.runelite.api.Tile;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.mapping.Import;
 
 public interface RSTile extends Tile
@@ -41,4 +42,11 @@ public interface RSTile extends Tile
     @Override
     @Import("y")
     int getY();
+
+    @Override
+    @Import("plane")
+    int getPlane();
+
+    @Override
+    WorldPoint getWorldLocation();
 }

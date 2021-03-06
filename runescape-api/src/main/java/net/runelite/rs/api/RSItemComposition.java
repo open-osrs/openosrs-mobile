@@ -29,15 +29,42 @@ import net.runelite.mapping.Import;
 
 public interface RSItemComposition extends ItemComposition
 {
-    @Override
     @Import("name")
+    @Override
     String getName();
 
+    @Import("id")
     @Override
-    @Import("isTradeable") //TODO: Confirm (There are only 2 bools here)
+    int getId();
+
+    @Import("noteTemplate")
+    @Override
+    int getNote();
+
+    @Import("note")
+    @Override
+    int getLinkedNoteId();
+
+    @Import("placeholder")
+    @Override
+    int getPlaceholderId();
+
+    @Import("placeholderTemplate")
+    @Override
+    int getPlaceholderTemplateId();
+
+    @Import("price")
+    @Override
+    int getPrice();
+
+    @Import("isMembersOnly")
+    @Override
+    boolean isMembers();
+
+    @Import("isTradable")
+    @Override
     boolean isTradeable();
 
-    @Override
-    @Import("isStackable") //TODO: Confirm
-    boolean isStackable();
+    @Import("isStackable")
+    int getIsStackable();
 }

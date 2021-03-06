@@ -50,6 +50,8 @@ public interface Client
 
 	int getBaseY();
 
+	int getRSPlane();
+
 	int getPlane();
 
 	boolean isInInstancedRegion();
@@ -61,4 +63,40 @@ public interface Client
 	Scene getScene();
 
 	ObjectComposition getObjectComposition(int objectId);
+
+	boolean isClientThread();
+
+	ItemComposition getItemComposition(int itemId);
+
+	int[][][] getTileHeights();
+
+	byte[][][] getTileSettings();
+
+	int getOverlayWidth();
+	int getOverlayHeight();
+
+	void setOverlayWidth(int width);
+	void setOverlayHeight(int height);
+
+	int getCameraZ();
+
+	int getCameraPitch();
+
+	int getCameraYaw();
+
+	int getCameraY();
+
+	int getCameraX();
+
+	int getCameraZoom();
+
+	int getViewportWidth();
+
+	int getViewportHeight();
+
+	String[] getDebugLines();
+
+	void setDebugLines(String[] debugLines);
+
+	boolean drawCheapGroundItems();
 }

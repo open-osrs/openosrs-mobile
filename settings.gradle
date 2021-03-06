@@ -1,3 +1,4 @@
+include ':http-api'
 include ':runelite-mixins'
 include ':runescape-api'
 include ':injection-annotations'

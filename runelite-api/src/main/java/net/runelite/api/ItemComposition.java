@@ -29,4 +29,11 @@ public interface ItemComposition
     String getName();
     boolean isTradeable();
     boolean isStackable();
+    int getNote();
+    int getLinkedNoteId();
+    int getId();
+    int getPlaceholderId();
+    int getPlaceholderTemplateId();
+    boolean isMembers();
+    int getPrice();
 }
