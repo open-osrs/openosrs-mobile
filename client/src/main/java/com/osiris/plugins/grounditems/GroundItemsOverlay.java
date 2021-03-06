@@ -76,6 +76,8 @@ public class GroundItemsOverlay extends Overlay {
                 textColor = medium;
             else if (alchValue > lowValue || geValue > lowValue)
                 textColor = low;
+            else
+            	return;
 
             text = itemManager.getItemComposition(groundItem.getId()).getName()
                     + " x" + groundItem.getQuantity()
