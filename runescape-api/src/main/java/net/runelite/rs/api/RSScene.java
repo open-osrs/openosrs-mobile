@@ -25,7 +25,11 @@
 package net.runelite.rs.api;
 
 import net.runelite.api.Scene;
+import net.runelite.mapping.Import;
 
 public interface RSScene extends Scene
 {
+    @Override
+    @Import("tiles")
+    RSTile[][][] getTiles();
 }

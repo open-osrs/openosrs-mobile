@@ -12,7 +12,6 @@ import com.osiris.util.PaintUtil;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
-import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 
@@ -35,6 +34,7 @@ public class GroundItemsOverlay extends Overlay {
         ItemManager itemManager = MainActivity.itemManager;
         ds[0] = GroundItemsPlugin.collectedGroundItems.size() + "";
         client.setDebugLines(ds);
+        Color white = Color.valueOf(Color.WHITE);
         int alchValue;
         int geValue;
         Color insane = Color.valueOf(Color.rgb(255, 102, 178));
@@ -70,7 +70,6 @@ public class GroundItemsOverlay extends Overlay {
             geValue = itemManager.getItemPrice(groundItem.getId())  * groundItem.getQuantity();
             alchValueText = NumberFormat.getNumberInstance(Locale.US).format(alchValue);
             geValueText = NumberFormat.getNumberInstance(Locale.US).format(geValue);
-            Color white = Color.valueOf(Color.WHITE);
 
             Color textColor = white;
             if (alchValue > insaneValue || geValue > insaneValue)
@@ -82,9 +81,9 @@ public class GroundItemsOverlay extends Overlay {
             else if (alchValue > lowValue || geValue > lowValue)
                 textColor = low;
 
-            if (client.drawCheapGroundItems())
-            if (textColor == white)
-            	return;
+            if (!client.drawCheapGroundItems())
+                if (textColor == white)
+            	    continue;
 
             text = itemManager.getItemComposition(groundItem.getId()).getName()
                     + " x" + groundItem.getQuantity()
