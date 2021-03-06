@@ -26,7 +26,6 @@ package net.runelite.rs.api;
 
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.TileObject;
 import net.runelite.api.mixins.Inject;
 import net.runelite.eventbus.EventBus;
 import net.runelite.mapping.Import;
@@ -153,4 +152,8 @@ public interface RSClient extends Client
 
 	@Override
 	boolean drawCheapGroundItems();
+
+	@Override
+	@Import("scene")
+	RSScene getScene();
 }

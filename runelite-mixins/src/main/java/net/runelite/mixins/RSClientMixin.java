@@ -26,9 +26,13 @@
 package net.runelite.mixins;
 
 import net.runelite.api.GameState;
+import net.runelite.api.Scene;
+import net.runelite.api.Tile;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.mixins.Copy;
+import net.runelite.api.mixins.FieldHook;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.MethodHook;
 import net.runelite.api.mixins.Mixin;
@@ -37,8 +41,12 @@ import net.runelite.api.mixins.Shadow;
 import net.runelite.eventbus.EventBus;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSItemComposition;
+import net.runelite.rs.api.RSNode;
+import net.runelite.rs.api.RSNodeDeque;
 import net.runelite.rs.api.RSObjectComposition;
 import net.runelite.rs.api.RSPacketBuffer;
+import net.runelite.rs.api.RSScene;
+import net.runelite.rs.api.RSTile;
 import net.runelite.rs.api.RSTileItem;
 
 import org.slf4j.Logger;
@@ -130,13 +138,45 @@ public abstract class RSClientMixin implements RSClient
 		return getItemComposition(id, -1);
 	}
 
-	//@FieldHook("gameState")
-	// TODO at org.objectweb.asm.Frame.merge: ArrayIndexOutOfBoundsException
-	public static void onGameStateChanged()
+	@FieldHook("gameState")
+	@Inject
+	public static void gameStateChanged(int idx)
 	{
-		GameStateChanged event = new GameStateChanged();
-		event.setGameState(client.getGameState());
-		eventBus.post(event);
+		GameStateChanged gameStateChange = new GameStateChanged();
+		GameState gameState = client.getGameState();
+		gameStateChange.setGameState(gameState);
+		client.getEventBus().post(gameStateChange);
+
+		if (gameState == GameState.LOGGED_IN)
+		{
+			int plane = client.getPlane();
+			RSScene scene = client.getScene();
+			RSTile[][][] tiles = scene.getTiles();
+			RSNodeDeque[][][] allItemDeque = client.getGroundItemDeque();
+			RSNodeDeque[][] planeItems = allItemDeque[plane];
+
+			for (int x = 0; x < 104; x++)
+			{
+				for (int y = 0; y < 104; y++)
+				{
+					RSNodeDeque itemDeque = planeItems[x][y];
+					if (itemDeque != null)
+					{
+						RSTile tile = tiles[plane][x][y];
+						RSNode head = itemDeque.getSentinel();
+
+						for (RSNode current = head.getNext(); current != head; current = current.getNext())
+						{
+							RSTileItem item = (RSTileItem) current;
+							item.setX(x);
+							item.setY(y);
+							ItemSpawned event = new ItemSpawned(tile, item);
+							client.getEventBus().post(event);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Inject
@@ -204,6 +244,7 @@ public abstract class RSClientMixin implements RSClient
 	{
 
 	}
+
 	//This is where the bubble will be toggled on and off, the entry way to plugin configuration
 	@Replace("doCheat")
 	public static void rl$doCheat(String command, int garbage)

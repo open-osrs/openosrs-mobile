@@ -223,29 +223,6 @@ public class MainActivity extends Activity {
 
         overlayThread.start();
 
-        Thread gamestateThread = new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(2);
-                    //This is a temp fix
-                    if (client != null)
-                    {
-                        if (client.getGameState() != lastknownGameState)
-                        {
-                            lastknownGameState = client.getGameState();
-                            GameStateChanged event = new GameStateChanged();
-                            event.setGameState(lastknownGameState);
-                            client.getEventBus().post(event);
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        gamestateThread.start();
-
         Toast.makeText(this,
                 "Welcome to OSiris!", Toast.LENGTH_LONG).show();
     }
