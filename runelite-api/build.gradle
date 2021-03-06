@@ -11,5 +11,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation files("../deobfuscator/lib/android.jar")
     compileOnly 'org.projectlombok:lombok:1.18.16'
 }

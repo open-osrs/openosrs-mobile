@@ -3,42 +3,53 @@
 package net.runelite.api;
 
 import android.graphics.Path;
+import android.util.Log;
 
 import net.runelite.api.coords.LocalPoint;
 
+import javax.annotation.Nonnull;
+
+import static net.runelite.api.Constants.TILE_FLAG_BRIDGE;
+
 public class Perspective {
-    public static final int[] COSINE;
     public static final int LOCAL_COORD_BITS = 7;
     public static final int LOCAL_HALF_TILE_SIZE = 64;
     public static final int LOCAL_TILE_SIZE = 128;
     public static final int SCENE_SIZE = 104;
-    public static final int[] SINE;
-    public static final double UNIT = 0.0030679615757712823;
+    public static final double UNIT = Math.PI / 1024d;
+
+    public static final int[] SINE = new int[2048]; // sine angles for each of the 2048 units, * 65536 and stored as an int
+    public static final int[] COSINE = new int[2048]; // cosine
 
     static {
-        SINE = new int[2048];
-        COSINE = new int[2048];
-        for (int i = 0; i < 2048; ++i) {
-            Perspective.SINE[i] = (int)(Math.sin((double)i * 0.0030679615757712823) * 65536.0);
-            Perspective.COSINE[i] = (int)(Math.cos((double)i * 0.0030679615757712823) * 65536.0);
+        for (int i = 0; i < 2048; ++i)
+        {
+            SINE[i] = (int) (65536.0D * Math.sin((double) i * UNIT));
+            COSINE[i] = (int) (65536.0D * Math.cos((double) i * UNIT));
         }
     }
 
-    public static Point getCanvasTextLocation(Object object, LocalPoint localPoint, String string, int n) {
+    public static Point getCanvasTextLocation(@Nonnull Client client, @Nonnull LocalPoint localPoint, String string, int n) {
         if (string == null) {
             return null;
         }
-        if ((object = Perspective.localToCanvas((Client)object, localPoint, ((Client)object).getPlane(), n)) == null) {
+        Point p = Perspective.localToCanvas(client, localPoint, client.getPlane(), n);
+        if (p == null) {
             return null;
         }
-        return new Point(((Point)object).getX(), ((Point)object).getY());
+        else
+        {
+            Log.e("Perspective", p.toString());
+        }
+
+        return new Point(p.getX(), p.getY());
     }
 
-    public static Path getCanvasTileAreaPoly(Client clientAPI, LocalPoint localPoint, int n) {
+    public static Path getCanvasTileAreaPoly(@Nonnull Client clientAPI, @Nonnull LocalPoint localPoint, int n) {
         return Perspective.getCanvasTileAreaPoly(clientAPI, localPoint, n, 0);
     }
 
-    public static Path getCanvasTileAreaPoly(Client client, LocalPoint localPoint, int n, int n2) {
+    public static Path getCanvasTileAreaPoly(@Nonnull Client client, @Nonnull LocalPoint localPoint, int n, int n2) {
         int n3 = client.getPlane();
         int n4 = localPoint.getX() - n * 128 / 2;
         int n5 = localPoint.getY() - n * 128 / 2;
@@ -77,15 +88,15 @@ public class Perspective {
         return null;
     }
 
-    public static Path getCanvasTilePoly(Client clientAPI, LocalPoint localPoint) {
+    public static Path getCanvasTilePoly(@Nonnull Client clientAPI, @Nonnull LocalPoint localPoint) {
         return Perspective.getCanvasTileAreaPoly(clientAPI, localPoint, 1);
     }
 
-    public static Path getCanvasTilePoly(Client clientAPI, LocalPoint localPoint, int n) {
+    public static Path getCanvasTilePoly(@Nonnull Client clientAPI, @Nonnull LocalPoint localPoint, int n) {
         return Perspective.getCanvasTileAreaPoly(clientAPI, localPoint, 1, n);
     }
 
-    private static int getHeight(Client client, int n, int n2, int n3) {
+    private static int getHeight(@Nonnull Client client, int n, int n2, int n3) {
         int n4 = n >> 7;
         int n5 = n2 >> 7;
         if (n4 >= 0 && n5 >= 0 && n4 < 104 && n5 < 104) {
@@ -95,28 +106,32 @@ public class Perspective {
         return 0;
     }
 
-    public static int getTileHeight(Client client, LocalPoint localPoint, int n) {
-        int n2 = localPoint.getSceneX();
-        int n3 = localPoint.getSceneY();
-        if (n2 >= 0 && n3 >= 0 && n2 < 104 && n3 < 104) {
-            int n4;
-            byte[][][] byArray = client.getTileSettings();
-            int[][][] object = client.getTileHeights();
-            int n5 = n4 = n;
-            if (n < 3) {
-                n5 = n4;
-                if ((byArray[1][n2][n3] & 2) == 2) {
-                    n5 = n + 1;
-                }
+    public static int getTileHeight(@Nonnull Client client, @Nonnull LocalPoint point, int plane) {
+        int sceneX = point.getSceneX();
+        int sceneY = point.getSceneY();
+        if (sceneX >= 0 && sceneY >= 0 && sceneX < SCENE_SIZE && sceneY < SCENE_SIZE)
+        {
+            byte[][][] tileSettings = client.getTileSettings();
+            int[][][] tileHeights = client.getTileHeights();
+
+            int z1 = plane;
+            if (plane < Constants.MAX_Z - 1 && (tileSettings[1][sceneX][sceneY] & TILE_FLAG_BRIDGE) == TILE_FLAG_BRIDGE)
+            {
+                z1 = plane + 1;
             }
-            n = localPoint.getX() & 0x7F;
-            n4 = localPoint.getY() & 0x7F;
-            return (128 - n4) * (object[n5][n2 + 1][n3] * n + (128 - n) * object[n5][n2][n3] >> 7) + n4 * (object[n5][n2][n3 + 1] * (128 - n) + object[n5][n2 + 1][n3 + 1] * n >> 7) >> 7;
+
+            int x = point.getX() & (LOCAL_TILE_SIZE - 1);
+            int y = point.getY() & (LOCAL_TILE_SIZE - 1);
+            int var8 = x * tileHeights[z1][sceneX + 1][sceneY] + (LOCAL_TILE_SIZE - x) * tileHeights[z1][sceneX][sceneY] >> LOCAL_COORD_BITS;
+            int var9 = tileHeights[z1][sceneX][sceneY + 1] * (LOCAL_TILE_SIZE - x) + x * tileHeights[z1][sceneX + 1][sceneY + 1] >> LOCAL_COORD_BITS;
+            return (LOCAL_TILE_SIZE - y) * var8 + y * var9 >> LOCAL_COORD_BITS;
         }
+
         return 0;
     }
 
-    public static Point localToCanvas(Client client, int n, int n2, int n3) {
+    /*
+    public static Point localToCanvas(@Nonnull Client client, int n, int n2, int n3) {
         if (n >= 128 && n2 >= 128 && n <= 13056 && n2 <= 13056) {
             int n4;
             int n5 = n3 - client.getCameraZ();
@@ -137,8 +152,45 @@ public class Perspective {
         }
         return null;
     }
+     */
 
-    public static Point localToCanvas(Client clientAPI, LocalPoint localPoint, int n, int n2) {
+    public static Point localToCanvas(@Nonnull Client client, int x, int y, int z)
+    {
+        if (x >= 128 && y >= 128 && x <= 13056 && y <= 13056)
+        {
+            x -= client.getCameraX();
+            y -= client.getCameraY();
+            z -= client.getCameraZ();
+
+            int cameraPitch = client.getCameraPitch();
+            int cameraYaw = client.getCameraYaw();
+
+            int pitchSin = SINE[cameraPitch];
+            int pitchCos = COSINE[cameraPitch];
+            int yawSin = SINE[cameraYaw];
+            int yawCos = COSINE[cameraYaw];
+
+            int var8 = yawCos * x + y * yawSin >> 16;
+            y = yawCos * y - yawSin * x >> 16;
+            x = var8;
+            var8 = pitchCos * z - y * pitchSin >> 16;
+            y = z * pitchSin + y * pitchCos >> 16;
+
+            if (y >= 50)
+            {
+                Log.e("Points", "x:" + x + " y:" + y);
+                double pointX = (double)(client.getViewportWidth() / 2 + x * client.getCameraZoom() / y) * (double)client.getOverlayWidth() / (double)client.getViewportWidth();
+                double pointY = (double)(client.getViewportHeight() / 2 + var8 * client.getCameraZoom() / y) * (double)client.getOverlayWidth() / (double)client.getViewportWidth();
+                return new Point(
+                        (int)pointX,
+                        (int)pointY);
+            }
+        }
+
+        return null;
+    }
+
+    public static Point localToCanvas(@Nonnull Client clientAPI, @Nonnull LocalPoint localPoint, int n, int n2) {
         n = Perspective.getTileHeight(clientAPI, localPoint, n);
         return Perspective.localToCanvas(clientAPI, localPoint.getX(), localPoint.getY(), n - n2);
     }

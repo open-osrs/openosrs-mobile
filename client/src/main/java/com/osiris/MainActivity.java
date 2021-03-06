@@ -47,13 +47,21 @@ import androidx.annotation.RequiresApi;
 import com.jagex.oldscape.android.AndroidLauncher;
 import com.osiris.api.ItemDefinitionManager;
 import com.osiris.game.ItemManager;
+import com.osiris.plugins.Overlay;
+import com.osiris.plugins.OverlayManager;
 import com.osiris.plugins.PluginManager;
+import com.osiris.plugins.grounditems.GroundItem;
 import com.osiris.plugins.grounditems.GroundItemsPlugin;
 import com.osiris.util.ExecutorServiceExceptionLogger;
 
 
+import net.runelite.api.GameState;
+import net.runelite.api.Perspective;
+import net.runelite.api.Point;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
@@ -97,18 +105,17 @@ public class MainActivity extends Activity {
     public static Bitmap overlayBitmap;
     Canvas canvas;
     Paint paint;
-    Typeface rsRegular;
+    public static Typeface rsRegular;
     Typeface rsSmall;
     Paint wallpaint;
     boolean isRendering = false;
     public static String[] debug = new String[10];
     Paint fishingSpotPaint = new Paint();
-    private int screenWidth;
-    private int screenHeight;
     Map<Tile, List<TileItem>> groundItems = new HashMap<>();
     public static ScheduledExecutorService executor = new ExecutorServiceExceptionLogger(Executors.newSingleThreadScheduledExecutor());
     public static ItemManager itemManager;
     public static InputStream itemVariations;
+    public static GameState lastknownGameState;
 
 
     //private final Map<WorldPoint, Integer> offsetMap = new HashMap<>();
@@ -151,10 +158,6 @@ public class MainActivity extends Activity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        screenWidth = displayMetrics.widthPixels + getNavBarWidth();
-        screenHeight = displayMetrics.heightPixels;
-
-
         Intent intent = new Intent(this, AndroidLauncher.class);
 
         //OSRS has checks for being task root so we must use these flags testing
@@ -172,6 +175,8 @@ public class MainActivity extends Activity {
                     PluginManager.registerPlugins();
                     Log.e(MAIN_ACTIVITY, "EventBus Registered");
                     itemManager = new ItemManager(client, executor, RuneLiteAPI.CLIENT);
+                    client.setOverlayWidth(displayMetrics.widthPixels + getNavBarWidth());
+                    client.setOverlayHeight(displayMetrics.heightPixels);
                 }
             }
             try {
@@ -184,7 +189,7 @@ public class MainActivity extends Activity {
 
         wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(screenWidth, screenHeight, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, FLAG_NOT_TOUCHABLE | FLAG_NOT_FOCUSABLE | FLAG_NOT_TOUCH_MODAL | FLAG_FULLSCREEN, PixelFormat.OPAQUE);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(displayMetrics.widthPixels + getNavBarWidth(), displayMetrics.heightPixels, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, FLAG_NOT_TOUCHABLE | FLAG_NOT_FOCUSABLE | FLAG_NOT_TOUCH_MODAL | FLAG_FULLSCREEN, PixelFormat.OPAQUE);
         params.gravity = Gravity.START | Gravity.TOP;
         params.x = 0;
         params.y = 0;
@@ -192,8 +197,8 @@ public class MainActivity extends Activity {
         overlayView = new ImageView(this);
         overlayView.setAlpha(1.0f);
 
-        overlayBitmap = Bitmap.createBitmap(screenWidth,
-                screenHeight, Bitmap.Config.ARGB_8888);
+        overlayBitmap = Bitmap.createBitmap(displayMetrics.widthPixels + getNavBarWidth(),
+                displayMetrics.heightPixels, Bitmap.Config.ARGB_8888);
         overlayBitmap.eraseColor(Color.TRANSPARENT);
         overlayBitmap = drawTextToBitmap(overlayBitmap, "OSiris", 0, 0);
         overlayView.setImageBitmap(overlayBitmap);
@@ -225,9 +230,15 @@ public class MainActivity extends Activity {
     }
 
     @Subscribe
+    public void onGameStateChanged(GameStateChanged event)
+    {
+        Log.e(MAIN_ACTIVITY, "New game state: " + event.getGameState().getState());
+    }
+
+    @Subscribe
     public void onPostItemComposition(PostItemComposition event)
     {
-        Log.e(MAIN_ACTIVITY, event.getItemComposition().getName() + " composition posted!");
+        //Log.e(MAIN_ACTIVITY, event.getItemComposition().getName() + " composition posted!");
     }
 
     @Subscribe
@@ -263,29 +274,33 @@ public class MainActivity extends Activity {
             groundItems.put(event.getTile(), tileItemList);
         }
         else groundItems.get(event.getTile()).add(event.getItem());
-        String alchValue = NumberFormat.getNumberInstance(Locale.US).format(
-                client.getItemComposition(event.getItem().getId()).getPrice() * event.getItem().getQuantity());
-        String geValue = NumberFormat.getNumberInstance(Locale.US).format(
-                itemManager.getItemPrice(event.getItem().getId())  * event.getItem().getQuantity());
-        Log.e(MAIN_ACTIVITY, itemManager.getItemComposition(event.getItem().getId()).getName()
-                + " x" + event.getItem().getQuantity()
-                + " Spawned, worth - (HA:" + alchValue
-                + ")(GE:" + geValue + ")");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateOverlay()
     {
+        //This is a temp fix
+        if (client != null)
+        {
+            if (client.getGameState() != lastknownGameState)
+            {
+                lastknownGameState = client.getGameState();
+                GameStateChanged event = new GameStateChanged();
+                event.setGameState(lastknownGameState);
+                client.getEventBus().post(event);
+            }
+        }
         runOnUiThread(() ->
         {
+            overlayBitmap.eraseColor(Color.TRANSPARENT);
             isRendering = true;
             boolean erased = false;
-
-
-            overlayBitmap.eraseColor(Color.TRANSPARENT);
             overlayBitmap = drawTextToBitmap(overlayBitmap, "OSiris", 0, 0);
             overlayBitmap = drawTextToBitmap(overlayBitmap, version, 0, 14 * 4);
-            debug[0] = "GroundItems: " + GroundItemsPlugin.collectedGroundItems.size();
+            if (client != null)
+            {
+                //debug[1] = "camX" + client.getCameraX();
+            }
 
             int i = 0;
             for (String s : debug)
@@ -295,6 +310,11 @@ public class MainActivity extends Activity {
                     overlayBitmap = drawTextToBitmap(overlayBitmap, "d: " + s, 0, 14 * 4 * (i + 2));
                     i++;
                 }
+            }
+
+            for (Overlay overlay : OverlayManager.overlays)
+            {
+                overlay.paint(overlayBitmap);
             }
             overlayView.setImageBitmap(overlayBitmap);
             isRendering = false;
@@ -318,6 +338,30 @@ public class MainActivity extends Activity {
         Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
         canvas.drawText(text, -bounds.left + x, -bounds.top + y, paint);
+
+        return bitmap;
+    }
+
+    public Bitmap drawTextToBitmap(Bitmap bitmap, Color color, String text, int x, int y) {
+        if (canvas == null)
+            canvas = new Canvas(bitmap);
+        // new antialised Paint
+        if (paint == null)
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // text color - #3D3D3D
+        paint.setColor(color.toArgb());
+        // text size in pixels
+        paint.setTextSize(14 * 4);
+
+        paint.setTypeface(rsSmall);
+        // text shadow
+        paint.setShadowLayer(5f, 5f, 5f, Color.BLACK);
+
+        // draw text to the Canvas center
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        canvas.drawText(text, x - (float)bounds.width() / 2, -bounds.top + y, paint);
 
         return bitmap;
     }

@@ -28,9 +28,11 @@ package net.runelite.mixins;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.mixins.Copy;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.MethodHook;
 import net.runelite.api.mixins.Mixin;
+import net.runelite.api.mixins.Replace;
 import net.runelite.api.mixins.Shadow;
 import net.runelite.eventbus.EventBus;
 import net.runelite.rs.api.RSClient;
@@ -62,6 +64,9 @@ public abstract class RSClientMixin implements RSClient
 
 	@Inject
 	public int overlayHeight;
+
+	@Inject
+	private String[] debugLines;
 
 	@Inject
 	@Override
@@ -173,6 +178,37 @@ public abstract class RSClientMixin implements RSClient
 	public int getOverlayWidth()
 	{
 		return overlayWidth;
+	}
+
+	@Inject
+	@Override
+	public String[] getDebugLines()
+	{
+		return debugLines;
+	}
+
+	@Inject
+	@Override
+	public void setDebugLines(String[] debugLines)
+	{
+		this.debugLines = debugLines;
+	}
+
+	@Copy("doCheat")
+	public static void rs$doCheat(String command, int garbage)
+	{
+
+	}
+	//This is where the bubble will be toggled on and off, the entry way to plugin configuration
+	@Replace("doCheat")
+	public static void rl$doCheat(String command, int garbage)
+	{
+		//Open OSiris config bubble here
+		if (command.equals("config"))
+		{
+			return;
+		}
+		rs$doCheat(command, garbage);
 	}
 }
 

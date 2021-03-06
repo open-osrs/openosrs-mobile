@@ -128,4 +128,26 @@ public interface RSClient extends Client
 	@Override
 	@Import("viewportHeight")
 	int getViewportHeight();
+
+	@Override
+	@Import("baseX")
+	int getBaseX();
+
+	@Override
+	@Import("baseY")
+	int getBaseY();
+
+	@Import("Tiles_heights")
+	@Override
+	int[][][] getTileHeights();
+
+	@Import("Tiles_renderFlags")
+	@Override
+	byte[][][] getTileSettings();
+
+	@Override
+	String[] getDebugLines();
+
+	@Override
+	void setDebugLines(String[] debugLines);
 }

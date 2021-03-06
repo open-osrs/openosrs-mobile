@@ -109,12 +109,12 @@ android {
     }
 
     task patchOkhttp(type: Copy) {
-        from file("./client-debug/smali/okhttp3/")
+        from file("./client-debug/smali_classes3/okhttp3/")
         into file("./osrs/smali/okhttp3/")
     }
 
     task patchOkio(type: Copy) {
-        from file("./client-debug/smali/okio/")
+        from file("./client-debug/smali_classes3/okio/")
         into file("./osrs/smali/okio/")
     }
 

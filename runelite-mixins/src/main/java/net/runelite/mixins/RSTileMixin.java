@@ -61,14 +61,12 @@ public abstract class RSTileMixin implements RSTile
 
 		RSNodeDeque oldQueue = lastGroundItems[z][x][y];
 		RSNodeDeque newQueue = groundItemDeque[z][x][y];
-		System.out.println("test1");
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
 			lastGroundItems[z][x][y] = newQueue;
 			client.setLastItemDespawn(null);
 			return;
 		}
-		System.out.println("test2");
 		if (oldQueue != newQueue)
 		{
 			if (oldQueue != null)
@@ -156,7 +154,7 @@ public abstract class RSTileMixin implements RSTile
 	@Override
 	public WorldPoint getWorldLocation()
 	{
-		return new WorldPoint(getX(), getY(), client.getPlane());
+		return WorldPoint.fromScene(client, getX(), getY(), client.getPlane());
 	}
 }
 

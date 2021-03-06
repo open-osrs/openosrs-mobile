@@ -2,6 +2,7 @@ package com.osiris.plugins.grounditems;
 
 import com.google.common.collect.EvictingQueue;
 import com.osiris.MainActivity;
+import com.osiris.plugins.OverlayManager;
 import com.osiris.plugins.Plugin;
 
 import net.runelite.api.GameState;
@@ -25,6 +26,8 @@ import lombok.Getter;
 
 public class GroundItemsPlugin extends Plugin {
 
+    public static GroundItemsOverlay overlay = new GroundItemsOverlay();
+
     public RSClient client = MainActivity.client;
 
     // The game won't send anything higher than this value to the plugin -
@@ -33,6 +36,10 @@ public class GroundItemsPlugin extends Plugin {
     // ItemID for coins
     private static final int COINS = ItemID.COINS_995;
     private int lastUsedItem;
+
+    static {
+        OverlayManager.registerOverlay(overlay);
+    }
 
     @Getter
     public static Map<GroundItem.GroundItemKey, GroundItem> collectedGroundItems = new LinkedHashMap<>();

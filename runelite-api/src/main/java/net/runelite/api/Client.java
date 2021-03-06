@@ -93,4 +93,8 @@ public interface Client
 	int getViewportWidth();
 
 	int getViewportHeight();
+
+	String[] getDebugLines();
+
+	void setDebugLines(String[] debugLines);
 }
