@@ -2,6 +2,7 @@ package com.osiris.plugins.grounditems;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.osiris.MainActivity;
 import com.osiris.game.ItemManager;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 public class GroundItemsOverlay extends Overlay {
 
+    String[] ds = new String[1];
     public static Map<WorldPoint, Integer> itemPiles = new HashMap<>();
 
     @Override
@@ -31,6 +33,8 @@ public class GroundItemsOverlay extends Overlay {
     {
         Client client = MainActivity.client;
         ItemManager itemManager = MainActivity.itemManager;
+        ds[0] = GroundItemsPlugin.collectedGroundItems.size() + "";
+        client.setDebugLines(ds);
         int alchValue;
         int geValue;
         Color insane = Color.valueOf(Color.rgb(255, 102, 178));
@@ -66,8 +70,9 @@ public class GroundItemsOverlay extends Overlay {
             geValue = itemManager.getItemPrice(groundItem.getId())  * groundItem.getQuantity();
             alchValueText = NumberFormat.getNumberInstance(Locale.US).format(alchValue);
             geValueText = NumberFormat.getNumberInstance(Locale.US).format(geValue);
+            Color white = Color.valueOf(Color.WHITE);
 
-            Color textColor = Color.valueOf(Color.WHITE);
+            Color textColor = white;
             if (alchValue > insaneValue || geValue > insaneValue)
                 textColor = insane;
             else if (alchValue > highValue || geValue > highValue)
@@ -76,18 +81,34 @@ public class GroundItemsOverlay extends Overlay {
                 textColor = medium;
             else if (alchValue > lowValue || geValue > lowValue)
                 textColor = low;
-            else
+
+            if (client.drawCheapGroundItems())
+            if (textColor == white)
             	return;
 
             text = itemManager.getItemComposition(groundItem.getId()).getName()
                     + " x" + groundItem.getQuantity()
                     + " - (HA:" + alchValueText
                     + ") (GE:" + geValueText + ")";
-            p = Perspective.getCanvasTextLocation(client, LocalPoint.fromWorld(client, groundItem.getLocation()), text, 0);
-            if (p!= null)
-                PaintUtil.drawTextToBitmap(overlay, textColor, text, p.getX(), p.getY() - i);
-
-            itemPiles.put(w, i + 40);
+            LocalPoint lp = LocalPoint.fromWorld(client, groundItem.getLocation());
+            if (lp !=null)
+            {
+                Log.e("planetest", groundItem.getLocation().getPlane() + "");
+                p = Perspective.getCanvasTextLocation(client, lp, text, groundItem.getLocation().getPlane(), 0);
+                if (p!= null)
+                {
+                    PaintUtil.drawTextToBitmap(overlay, textColor, text, p.getX(), p.getY() - i);
+                    itemPiles.put(w, i + 40);
+                }
+                else
+                {
+                    Log.e("GroundItemsOverlay", "p null");
+                }
+            }
+            else
+            {
+                Log.e("GroundItemsOverlay", "lp null");
+            }
         }
         itemPiles.clear();
     }

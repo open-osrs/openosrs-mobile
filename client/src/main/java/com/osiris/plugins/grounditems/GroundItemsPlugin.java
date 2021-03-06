@@ -10,6 +10,7 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemID;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
@@ -59,10 +60,12 @@ public class GroundItemsPlugin extends Plugin {
     {
         TileItem item = itemSpawned.getItem();
         Tile tile = itemSpawned.getTile();
-
+        WorldPoint wp = tile.getWorldLocation();
+        wp.setPlane(client.getPlane());
         GroundItem groundItem = buildGroundItem(tile, item);
+        groundItem.setLocation(wp);
 
-        GroundItem.GroundItemKey groundItemKey = new GroundItem.GroundItemKey(item.getId(), tile.getWorldLocation());
+        GroundItem.GroundItemKey groundItemKey = new GroundItem.GroundItemKey(item.getId(), wp);
         GroundItem existing = collectedGroundItems.putIfAbsent(groundItemKey, groundItem);
         if (existing != null)
         {
@@ -76,8 +79,9 @@ public class GroundItemsPlugin extends Plugin {
     {
         TileItem item = itemDespawned.getItem();
         Tile tile = itemDespawned.getTile();
-
-        GroundItem.GroundItemKey groundItemKey = new GroundItem.GroundItemKey(item.getId(), tile.getWorldLocation());
+        WorldPoint wp = tile.getWorldLocation();
+        wp.setPlane(client.getPlane());
+        GroundItem.GroundItemKey groundItemKey = new GroundItem.GroundItemKey(item.getId(), wp);
         GroundItem groundItem = collectedGroundItems.get(groundItemKey);
         if (groundItem == null)
         {
@@ -103,11 +107,13 @@ public class GroundItemsPlugin extends Plugin {
     {
         TileItem item = itemQuantityChanged.getItem();
         Tile tile = itemQuantityChanged.getTile();
+        WorldPoint wp = tile.getWorldLocation();
+        wp.setPlane(client.getPlane());
         int oldQuantity = itemQuantityChanged.getOldQuantity();
         int newQuantity = itemQuantityChanged.getNewQuantity();
 
         int diff = newQuantity - oldQuantity;
-        GroundItem.GroundItemKey groundItemKey = new GroundItem.GroundItemKey(item.getId(), tile.getWorldLocation());
+        GroundItem.GroundItemKey groundItemKey = new GroundItem.GroundItemKey(item.getId(), wp);
         GroundItem groundItem = collectedGroundItems.get(groundItemKey);
         if (groundItem != null)
         {

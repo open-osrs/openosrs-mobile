@@ -150,4 +150,7 @@ public interface RSClient extends Client
 
 	@Override
 	void setDebugLines(String[] debugLines);
+
+	@Override
+	boolean drawCheapGroundItems();
 }

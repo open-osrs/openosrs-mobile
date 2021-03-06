@@ -32,6 +32,7 @@ public interface Tile extends TileObject
     ItemLayer getItemLayer();
     int getX();
     int getY();
+    int getPlane();
 
     WorldPoint getWorldLocation();
 }

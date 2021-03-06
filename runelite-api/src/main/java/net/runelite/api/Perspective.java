@@ -29,11 +29,11 @@ public class Perspective {
         }
     }
 
-    public static Point getCanvasTextLocation(@Nonnull Client client, @Nonnull LocalPoint localPoint, String string, int n) {
+    public static Point getCanvasTextLocation(@Nonnull Client client, @Nonnull LocalPoint localPoint, String string, int plane, int n) {
         if (string == null) {
             return null;
         }
-        Point p = Perspective.localToCanvas(client, localPoint, client.getPlane(), n);
+        Point p = Perspective.localToCanvas(client, localPoint, plane, n);
         if (p == null) {
             return null;
         }
@@ -96,13 +96,21 @@ public class Perspective {
         return Perspective.getCanvasTileAreaPoly(clientAPI, localPoint, 1, n);
     }
 
-    private static int getHeight(@Nonnull Client client, int n, int n2, int n3) {
-        int n4 = n >> 7;
-        int n5 = n2 >> 7;
-        if (n4 >= 0 && n5 >= 0 && n4 < 104 && n5 < 104) {
-            int[][][] object = client.getTileHeights();
-            return (128 - (n2 &= 0x7F)) * (object[n3][n4 + 1][n5] * (n &= 0x7F) + (128 - n) * object[n3][n4][n5] >> 7) + n2 * (object[n3][n4][n5 + 1] * (128 - n) + object[n3][n4 + 1][n5 + 1] * n >> 7) >> 7;
+    private static int getHeight(@Nonnull Client client, int localX, int localY, int plane)
+    {
+        int sceneX = localX >> LOCAL_COORD_BITS;
+        int sceneY = localY >> LOCAL_COORD_BITS;
+        if (sceneX >= 0 && sceneY >= 0 && sceneX < SCENE_SIZE && sceneY < SCENE_SIZE)
+        {
+            int[][][] tileHeights = client.getTileHeights();
+
+            int x = localX & (LOCAL_TILE_SIZE - 1);
+            int y = localY & (LOCAL_TILE_SIZE - 1);
+            int var8 = x * tileHeights[plane][sceneX + 1][sceneY] + (LOCAL_TILE_SIZE - x) * tileHeights[plane][sceneX][sceneY] >> LOCAL_COORD_BITS;
+            int var9 = tileHeights[plane][sceneX][sceneY + 1] * (LOCAL_TILE_SIZE - x) + x * tileHeights[plane][sceneX + 1][sceneY + 1] >> LOCAL_COORD_BITS;
+            return (LOCAL_TILE_SIZE - y) * var8 + y * var9 >> LOCAL_COORD_BITS;
         }
+
         return 0;
     }
 
@@ -113,7 +121,8 @@ public class Perspective {
         {
             byte[][][] tileSettings = client.getTileSettings();
             int[][][] tileHeights = client.getTileHeights();
-
+            if (plane < 0)
+                plane = 0;
             int z1 = plane;
             if (plane < Constants.MAX_Z - 1 && (tileSettings[1][sceneX][sceneY] & TILE_FLAG_BRIDGE) == TILE_FLAG_BRIDGE)
             {

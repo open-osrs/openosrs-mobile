@@ -44,5 +44,9 @@ public interface RSTile extends Tile
     int getY();
 
     @Override
+    @Import("plane")
+    int getPlane();
+
+    @Override
     WorldPoint getWorldLocation();
 }

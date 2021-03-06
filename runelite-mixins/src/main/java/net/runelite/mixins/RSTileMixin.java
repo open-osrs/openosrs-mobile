@@ -154,7 +154,7 @@ public abstract class RSTileMixin implements RSTile
 	@Override
 	public WorldPoint getWorldLocation()
 	{
-		return WorldPoint.fromScene(client, getX(), getY(), client.getPlane());
+		return WorldPoint.fromScene(client, getX(), getY(), getPlane());
 	}
 }
 

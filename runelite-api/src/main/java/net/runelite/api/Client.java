@@ -97,4 +97,6 @@ public interface Client
 	String[] getDebugLines();
 
 	void setDebugLines(String[] debugLines);
+
+	boolean drawCheapGroundItems();
 }

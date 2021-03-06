@@ -110,8 +110,6 @@ public class MainActivity extends Activity {
     Paint wallpaint;
     boolean isRendering = false;
     public static String[] debug = new String[10];
-    Paint fishingSpotPaint = new Paint();
-    Map<Tile, List<TileItem>> groundItems = new HashMap<>();
     public static ScheduledExecutorService executor = new ExecutorServiceExceptionLogger(Executors.newSingleThreadScheduledExecutor());
     public static ItemManager itemManager;
     public static InputStream itemVariations;
@@ -225,6 +223,29 @@ public class MainActivity extends Activity {
 
         overlayThread.start();
 
+        Thread gamestateThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(2);
+                    //This is a temp fix
+                    if (client != null)
+                    {
+                        if (client.getGameState() != lastknownGameState)
+                        {
+                            lastknownGameState = client.getGameState();
+                            GameStateChanged event = new GameStateChanged();
+                            event.setGameState(lastknownGameState);
+                            client.getEventBus().post(event);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        gamestateThread.start();
+
         Toast.makeText(this,
                 "Welcome to OSiris!", Toast.LENGTH_LONG).show();
     }
@@ -247,49 +268,9 @@ public class MainActivity extends Activity {
         Log.e(MAIN_ACTIVITY, "onGameTick!");
     }
 
-    @Subscribe
-    public void onItemDespawned(ItemDespawned event)
-    {
-        groundItems.get(event.getTile()).add(event.getItem());
-        if (groundItems.get(event.getTile()).size() == 0)
-            groundItems.remove(event.getTile());
-        Log.e(MAIN_ACTIVITY, itemManager.getItemComposition(event.getItem().getId()).getName() + " Despawned");
-    }
-
-    @Subscribe
-    public void onItemQuantityChanged(ItemQuantityChanged event)
-    {
-        groundItems.get(event.getTile()).remove(event.getItem());
-        groundItems.get(event.getTile()).add(event.getItem());
-        Log.e(MAIN_ACTIVITY, itemManager.getItemComposition(event.getItem().getId()).getName() + " Quantity Changed");
-    }
-
-    @Subscribe
-    public void onItemSpawned(ItemSpawned event)
-    {
-        if (!groundItems.containsKey(event.getTile()))
-        {
-            List<TileItem> tileItemList = new ArrayList<>();
-            tileItemList.add(event.getItem());
-            groundItems.put(event.getTile(), tileItemList);
-        }
-        else groundItems.get(event.getTile()).add(event.getItem());
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateOverlay()
     {
-        //This is a temp fix
-        if (client != null)
-        {
-            if (client.getGameState() != lastknownGameState)
-            {
-                lastknownGameState = client.getGameState();
-                GameStateChanged event = new GameStateChanged();
-                event.setGameState(lastknownGameState);
-                client.getEventBus().post(event);
-            }
-        }
         runOnUiThread(() ->
         {
             overlayBitmap.eraseColor(Color.TRANSPARENT);
@@ -303,7 +284,9 @@ public class MainActivity extends Activity {
             }
 
             int i = 0;
-            for (String s : debug)
+            if (client != null)
+                if (client.getDebugLines() != null)
+            for (String s : client.getDebugLines())
             {
                 if (s != null)
                 {

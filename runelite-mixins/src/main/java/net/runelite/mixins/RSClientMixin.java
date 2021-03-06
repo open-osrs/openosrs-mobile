@@ -66,7 +66,10 @@ public abstract class RSClientMixin implements RSClient
 	public int overlayHeight;
 
 	@Inject
-	private String[] debugLines;
+	private String[] debugLines = new String[10];
+
+	@Inject
+	private static boolean isDrawCheapGroundItems = false;
 
 	@Inject
 	@Override
@@ -149,6 +152,8 @@ public abstract class RSClientMixin implements RSClient
 	{
 		plane = getRSPlane();
 		plane *= -660826149;
+		if (plane < 0)
+			return 0;
 		return plane;
 	}
 
@@ -208,7 +213,19 @@ public abstract class RSClientMixin implements RSClient
 		{
 			return;
 		}
+		else if (command.equals("items.drawcheap"))
+		{
+			isDrawCheapGroundItems = !isDrawCheapGroundItems;
+			return;
+		}
 		rs$doCheat(command, garbage);
+	}
+
+	@Inject
+	@Override
+	public boolean drawCheapGroundItems()
+	{
+		return isDrawCheapGroundItems;
 	}
 }
 
